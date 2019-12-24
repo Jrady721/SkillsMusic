@@ -98,7 +98,15 @@ class AlbumList extends React.Component {
         console.log(list)
 
         // 발매일 내림차순
-        return (list)
+        return (
+            <div className="albums row">
+                {/*내용이 비어있을 경우*/}
+                <h1 className="empty" style={{display: 'none', textAlign: 'center', marginTop: '250px'}}>
+                    검색된 앨범이 없습니다.
+                </h1>
+                {list}
+            </div>
+        )
     }
 }
 
@@ -115,7 +123,42 @@ class App extends React.Component {
 
     render() {
         return (
-            "<div></div>"
+            <div className='container-fluid'>
+                <div className="row">
+                    {/*left-side*/}
+                    <div className="col-2 bg-secondary pt-3 left-side">
+                        {/*검색*/}
+                        <div className="search">
+                            <div className="form-group input-group">
+                                <input type="text" className="form-control" placeholder="앨범검색"/>
+                                <div className="input-group-append">
+                                    <div className="input-group-text">
+                                        <button className="btn btn-default" type="button"><i
+                                            className="fa fa-search"/></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/*카테고리 목록 */}
+                        <CategoryList/>
+                    </div>
+                    {/*right side*/}
+                    <div className="col-10 pt-3">
+                        {/*right-side__header*/}
+                        <div className="row">
+                            <div className="col-12">
+                                <h2 className="title-category">ALL</h2>
+                            </div>
+                        </div>
+
+                        <hr/>
+
+                        {/*앨범목록*/}
+                        <AlbumList/>
+                    </div>
+                </div>
+            </div>
         )
     }
 }
@@ -129,13 +172,13 @@ function Category(props) {
     if (props.i === 0) {
         return (
             <li className={'list-group-item ' + props.active} onClick={activeMenu}>
-                <i className="fa fa-th-list"></i> <span>{props.category}</span>
+                <i className="fa fa-th-list"/> <span>{props.category}</span>
             </li>
         )
     } else {
         return (
             <li className={'list-group-item ' + props.active} onClick={activeMenu}>
-                <i className="fas fa-play-circle"></i> <span>{props.category}</span>
+                <i className="fas fa-play-circle"/> <span>{props.category}</span>
             </li>
         )
     }
@@ -180,7 +223,11 @@ class CategoryList extends React.Component {
                                                                   active={activeArr[index]} i={index}
                                                                   category={menu}/>)
 
-        return (categories)
+        return (
+            <ul className="list-group list-group-flush" id="main-menu">
+                {categories}
+            </ul>
+        )
     }
 }
 
@@ -191,10 +238,6 @@ fetch('/music_data.json').then(res => res.json()).then(json => {
     });
 
     data = json.data
-
-    /* 앨범목록 처리하기 */
-    const domContainer = document.querySelector('.albums')
-    ReactDOM.render(e(AlbumList), domContainer)
 
     /* 메뉴 정리하기 */
     let items = ''
@@ -209,45 +252,45 @@ fetch('/music_data.json').then(res => res.json()).then(json => {
         }
 
         /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
-        items += `<tr data-idx="${i + 1}" style="display: none;">
-                                            <td class="albuminfo">
-                                                <img src="/images/${e.albumJaketImage}">
-                                                <div class="info">
-                                                    <h4>${e.albumName}</h4>
-                                                    <span>
-                                                        <i class="fa fa-microphone"> 아티스트</i> 
-                                                        <p>${e.artist}</p>
-                                                    </span>
-                                                    <span>
-                                                        <i class="fa  fa-calendar"> 발매일</i> 
-                                                        <p>${e.release}</p>
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td class="albumprice">
-                                                ￦ ${num(e.price).toLocaleString()}
-                                            </td>
-                                            <td class="albumqty">
-                                                <input type="number" class="form-control" min="1" value="0">
-                                            </td>
-                                            <td class="pricesum">
-                                                ￦ 0
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-default">
-                                                    <i class="fa fa-trash-o"></i> 삭제
-                                                </button>
-                                            </td>
-                                        </tr>`
+        items += `<tr data-idx="${i + 1}" style={{display: 'none'}}>
+                    <td class="albuminfo">
+                        <img src="/images/${e.albumJaketImage}">
+                        <div class="info">
+                            <h4>${e.albumName}</h4>
+                            <span>
+                                <i class="fa fa-microphone"> 아티스트</i> 
+                                <p>${e.artist}</p>
+                            </span>
+                            <span>
+                                <i class="fa  fa-calendar"> 발매일</i> 
+                                <p>${e.release}</p>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="albumprice">
+                        ￦ ${num(e.price).toLocaleString()}
+                    </td>
+                    <td class="albumqty">
+                        <input type="number" class="form-control" min="1" value="0">
+                    </td>
+                    <td class="pricesum">
+                        ￦ 0
+                    </td>
+                    <td>
+                        <button class="btn btn-default">
+                            <i class="fa fa-trash-o"></i> 삭제
+                        </button>
+                    </td>
+                </tr>`
     })
 
-    /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
-    ReactDOM.render(e(CategoryList), document.querySelector('#main-menu'))
+    ReactDOM.render(e(App), document.querySelector('main'))
 
     /* 아이템 목록 추가 */
     $('.modal tbody').html(items)
 })
 
+/* 콤마 찍기. */
 const comma = (str) => {
     console.log(str)
 

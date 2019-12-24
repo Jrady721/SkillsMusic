@@ -11,24 +11,7 @@
     <!-- CUSTOM -->
     <link href="/assets/css/style.css" rel="stylesheet"/>
 
-    <!-- JavaScripts -->
-    <script src="assets/js/jquery-3.4.1.js"></script>
-    <script src="assets/bootstrap-4.4.1-dist/js/bootstrap.js"></script>
 
-    <!-- CUSTOM -->
-    <script src="assets/js/script.js" defer></script>
-
-    <!-- React 를 실행. -->
-    <!-- 주의: 사이트를 배포할 때는 "development.js"를 "production.min.js"로 대체하세요. -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-    <!-- 바벨 -->
-    <!--    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>-->
-
-    <!-- 만든 React 컴포넌트를 실행. -->
-    <!--    <script src="/assets/js/react.js" type="text/babel"></script>-->
-    <script src="/assets/js/react.js" defer></script>
 </head>
 <body>
 <!-- APP -->
@@ -110,45 +93,8 @@
     </header>
 
     <!-- main -->
-    <main class="">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- left-side -->
-                <div class="col-2 bg-secondary pt-3 left-side">
-                    <!-- 검색 -->
-                    <div class="search">
-                        <div class="form-group input-group">
-                            <input type="text" class="form-control" placeholder="앨범검색">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <ul class="list-group list-group-flush" id="main-menu"></ul>
-                </div>
-                <!-- right side -->
-                <div class="col-10 pt-3">
-                    <!-- right-side__header -->
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="title-category">ALL</h2>
-                        </div>
-                    </div>
-
-                    <hr/>
-
-                    <!-- 앨범목록 -->
-                    <div class="albums row">
-                        <!-- 내용이 비어있을 경우-->
-                        <h1 class="empty" style="display: none; text-align: center; margin-top: 250px; ">검색된 앨범이
-                            없습니다.</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <main>
+        <!-- REACT APP -->
     </main>
 
     <!-- footer -->
@@ -157,5 +103,25 @@
     </footer>
 </div>
 <!-- /. APP  -->
+
+
+<!-- JavaScripts -->
+<script src="assets/js/jquery-3.4.1.js"></script>
+<script src="assets/bootstrap-4.4.1-dist/js/bootstrap.js"></script>
+
+<!-- CUSTOM -->
+<script src="assets/js/script.js"></script>
+
+<!-- React 를 실행. -->
+<!-- 주의: 사이트를 배포할 때는 "development.js"를 "production.min.js"로 대체하세요. -->
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+<!-- 바벨 -->
+<!--    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>-->
+
+<!-- 만든 React 컴포넌트를 실행. -->
+<!--    <script src="/assets/js/react.js" type="text/babel"></script>-->
+<script src="/assets/js/react.js"></script>
 </body>
 </html>

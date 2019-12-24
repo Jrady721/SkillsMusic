@@ -160,7 +160,16 @@ var AlbumList = function (_React$Component) {
             console.log(list);
 
             // 발매일 내림차순
-            return list;
+            return React.createElement(
+                'div',
+                { className: 'albums row' },
+                React.createElement(
+                    'h1',
+                    { className: 'empty', style: { display: 'none', textAlign: 'center', marginTop: '250px' } },
+                    '\uAC80\uC0C9\uB41C \uC568\uBC94\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.'
+                ),
+                list
+            );
         }
     }]);
 
@@ -188,7 +197,61 @@ var App = function (_React$Component2) {
     _createClass(App, [{
         key: 'render',
         value: function render() {
-            return "<div></div>";
+            return React.createElement(
+                'div',
+                { className: 'container-fluid' },
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    React.createElement(
+                        'div',
+                        { className: 'col-2 bg-secondary pt-3 left-side' },
+                        React.createElement(
+                            'div',
+                            { className: 'search' },
+                            React.createElement(
+                                'div',
+                                { className: 'form-group input-group' },
+                                React.createElement('input', { type: 'text', className: 'form-control', placeholder: '\uC568\uBC94\uAC80\uC0C9' }),
+                                React.createElement(
+                                    'div',
+                                    { className: 'input-group-append' },
+                                    React.createElement(
+                                        'div',
+                                        { className: 'input-group-text' },
+                                        React.createElement(
+                                            'button',
+                                            { className: 'btn btn-default', type: 'button' },
+                                            React.createElement('i', {
+                                                className: 'fa fa-search' })
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement(CategoryList, null)
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'col-10 pt-3' },
+                        React.createElement(
+                            'div',
+                            { className: 'row' },
+                            React.createElement(
+                                'div',
+                                { className: 'col-12' },
+                                React.createElement(
+                                    'h2',
+                                    { className: 'title-category' },
+                                    'ALL'
+                                )
+                            )
+                        ),
+                        React.createElement('hr', null),
+                        React.createElement(AlbumList, null)
+                    )
+                )
+            );
         }
     }]);
 
@@ -285,7 +348,11 @@ var CategoryList = function (_React$Component3) {
                     category: menu });
             });
 
-            return categories;
+            return React.createElement(
+                'ul',
+                { className: 'list-group list-group-flush', id: 'main-menu' },
+                categories
+            );
         }
     }]);
 
@@ -304,10 +371,6 @@ fetch('/music_data.json').then(function (res) {
 
     data = json.data;
 
-    /* 앨범목록 처리하기 */
-    var domContainer = document.querySelector('.albums');
-    ReactDOM.render(e(AlbumList), domContainer);
-
     /* 메뉴 정리하기 */
     var items = '';
 
@@ -321,16 +384,16 @@ fetch('/music_data.json').then(function (res) {
         }
 
         /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
-        items += '<tr data-idx="' + (i + 1) + '" style="display: none;">\n                                            <td class="albuminfo">\n                                                <img src="/images/' + e.albumJaketImage + '">\n                                                <div class="info">\n                                                    <h4>' + e.albumName + '</h4>\n                                                    <span>\n                                                        <i class="fa fa-microphone"> \uC544\uD2F0\uC2A4\uD2B8</i> \n                                                        <p>' + e.artist + '</p>\n                                                    </span>\n                                                    <span>\n                                                        <i class="fa  fa-calendar"> \uBC1C\uB9E4\uC77C</i> \n                                                        <p>' + e.release + '</p>\n                                                    </span>\n                                                </div>\n                                            </td>\n                                            <td class="albumprice">\n                                                \uFFE6 ' + num(e.price).toLocaleString() + '\n                                            </td>\n                                            <td class="albumqty">\n                                                <input type="number" class="form-control" min="1" value="0">\n                                            </td>\n                                            <td class="pricesum">\n                                                \uFFE6 0\n                                            </td>\n                                            <td>\n                                                <button class="btn btn-default">\n                                                    <i class="fa fa-trash-o"></i> \uC0AD\uC81C\n                                                </button>\n                                            </td>\n                                        </tr>';
+        items += '<tr data-idx="' + (i + 1) + '" style={{display: \'none\'}}>\n                    <td class="albuminfo">\n                        <img src="/images/' + e.albumJaketImage + '">\n                        <div class="info">\n                            <h4>' + e.albumName + '</h4>\n                            <span>\n                                <i class="fa fa-microphone"> \uC544\uD2F0\uC2A4\uD2B8</i> \n                                <p>' + e.artist + '</p>\n                            </span>\n                            <span>\n                                <i class="fa  fa-calendar"> \uBC1C\uB9E4\uC77C</i> \n                                <p>' + e.release + '</p>\n                            </span>\n                        </div>\n                    </td>\n                    <td class="albumprice">\n                        \uFFE6 ' + num(e.price).toLocaleString() + '\n                    </td>\n                    <td class="albumqty">\n                        <input type="number" class="form-control" min="1" value="0">\n                    </td>\n                    <td class="pricesum">\n                        \uFFE6 0\n                    </td>\n                    <td>\n                        <button class="btn btn-default">\n                            <i class="fa fa-trash-o"></i> \uC0AD\uC81C\n                        </button>\n                    </td>\n                </tr>';
     });
 
-    /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
-    ReactDOM.render(e(CategoryList), document.querySelector('#main-menu'));
+    ReactDOM.render(e(App), document.querySelector('main'));
 
     /* 아이템 목록 추가 */
     $('.modal tbody').html(items);
 });
 
+/* 콤마 찍기. */
 var comma = function comma(str) {
     console.log(str);
 
