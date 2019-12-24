@@ -1,9 +1,7 @@
 'use strict';
-
 const e = React.createElement;
 
 let data = []
-
 
 /* 장바구니 담기 버튼 */
 function CartButton(props) {
@@ -11,12 +9,6 @@ function CartButton(props) {
         props.onCountChange()
         console.log('버튼 클릭')
     }
-
-    // return (
-    //     <button className="btn btn-default btn-xs btn-cart" data-count={props.count} onClick={addCount}>
-    //         <i className="fa fa-shopping-cart"/>
-    //     </button>
-    // )
 
     if (props.count) {
         return (
@@ -36,15 +28,12 @@ function CartButton(props) {
 
 /* 앨범 */
 function Album(props) {
-    // const [count, setCount] = useState(0)
-
     const countChange = () => {
         props.onUpdate(props.i)
-        console.log(props.i)
     }
 
     return (
-        <div className="col-md-2 col-sm-2 col-xs-2 product-grid album" data-category={props.e.category}
+        <div className="col-2 product-grid album" data-category={props.e.category}
              data-name={props.e.albumName} data-idx={props.i + 1}>
             <div className="product-items">
                 <div className="project-eff">
@@ -77,35 +66,72 @@ class AlbumList extends React.Component {
         super(props);
 
         this.state = {
-            data: [],
-            menus: []
+            data: []
         }
 
         this.changeCountData = this.changeCountData.bind(this)
     }
 
     componentWillMount() {
-        fetch('/music_data.json').then(res => res.json()).then(json => {
-            json.data.sort(function (a, b) {
-                return a.release > b.release ? -1 : 1;
-            });
+        this.setState({data: data})
+    }
 
-            this.setState({data: json.data})
+    componentDidMount() {
 
-            let menuArr = ['발라드']
-            let menus = ''
-            let items = ''
+    }
 
-            /* json 데이터를 돌아가면서 보여주기 */
-            json.data.filter((e, i) => {
-                if ($.inArray(e.category, menuArr) === -1) {
-                    menuArr.push(e.category)
-                    menus += ` <li>
-                        <a href="#"><i class="fa fa-youtube-play fa-2x"></i> <span>${e.category}</span></a>
-                    </li>`
-                }
+    changeCountData(i) {
+        console.log(this.state)
+        let newData = this.state.data
+        newData[i].count = newData[i].count + 1
 
-                items += `<tr data-idx="${i + 1}" style="display: none;">
+        this.setState({data: newData})
+    }
+
+    render() {
+        console.log(this.state.data)
+
+        /* 저거 할 때 중괄호 넣으면 안됀다... 중괄호 안넣어서 2시간 동안 고민함;;; */
+        const list = this.state.data.map((e, i) => <Album onUpdate={this.changeCountData} key={i} e={e} i={i}/>)
+
+        console.log(list)
+
+        // 발매일 내림차순
+        return (list)
+    }
+}
+
+/* 비동기적으로 데이터 처리 */
+fetch('/music_data_org.json').then(res => res.json()).then(json => {
+    json.data.sort(function (a, b) {
+        return a.release > b.release ? -1 : 1;
+    });
+
+    data = json.data
+
+    /* 앨범목록 처리하기 */
+    const domContainer = document.querySelector('.albums')
+    ReactDOM.render(e(AlbumList), domContainer)
+
+    /* 메뉴 정리하기 */
+    let menuArr = ['발라드']
+    let menus = ''
+    let items = ''
+
+    /* json 데이터를 돌아가면서 보여주기 */
+    data.filter((e, i) => {
+        data[i].count = 0
+
+        if ($.inArray(e.category, menuArr) === -1) {
+            menuArr.push(e.category)
+
+            /* menu 목록, 이 부분도 React로 처리하기 */
+
+            menus += `<li class="list-group-item"><i class="fas fa-play-circle"></i> <span>${e.category}</span></li>`
+        }
+
+        /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
+        items += `<tr data-idx="${i + 1}" style="display: none;">
                                             <td class="albuminfo">
                                                 <img src="/images/${e.albumJaketImage}">
                                                 <div class="info">
@@ -135,64 +161,12 @@ class AlbumList extends React.Component {
                                                 </button>
                                             </td>
                                         </tr>`
-
-                /* 갯수 정보 추가 */
-                this.state.data[i].count = 0
-            })
-
-            $('.nav').append(menus)
-
-            /* 아이템 목록 추가 */
-            $('.modal tbody').html(items)
-        })
-    }
-
-    componentDidMount() {
-
-    }
-
-    changeCountData(i) {
-        console.log(this.state)
-        let newData = this.state.data
-        newData[i].count = newData[i].count + 1
-
-        this.setState({data: newData})
-    }
-
-    render() {
-        console.log(this.state.data)
-
-        /* 저거 할 때 중괄호 넣으면 안됀다... 중괄호 안넣어서 2시간 동안 고민함;;; */
-        const list = this.state.data.map((e, i) => <Album onUpdate={this.changeCountData} key={i} e={e} i={i}/>)
-
-        console.log(list)
-
-        // 발매일 내림차순
-        return (
-            <div>{list}</div>
-        )
-    }
-}
+    })
 
 
-// function AlbumData(props) {
-//     return (
-//         <span>
-//             <i className="fa fa-money"> 가격</i>
-//             <p>￦{props.e.price.toLocaleString()}</p>
-//         </span>
-//     )
-// }
+    /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
+    $('#main-menu').append(menus)
 
-
-/* 비동기적으로 데이터 처리 */
-fetch('/music_data.json').then(res => res.json()).then(json => {
-    json.data.sort(function (a, b) {
-        return a.release > b.release ? -1 : 1;
-    });
-
-    data = json.data
-
-    const domContainer = document.querySelector('.contents')
-    ReactDOM.render(e(AlbumList), domContainer)
+    /* 아이템 목록 추가 */
+    $('.modal tbody').html(items)
 })

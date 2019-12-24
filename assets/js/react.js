@@ -19,12 +19,6 @@ function CartButton(props) {
         console.log('버튼 클릭');
     };
 
-    // return (
-    //     <button className="btn btn-default btn-xs btn-cart" data-count={props.count} onClick={addCount}>
-    //         <i className="fa fa-shopping-cart"/>
-    //     </button>
-    // )
-
     if (props.count) {
         return React.createElement(
             'button',
@@ -42,16 +36,13 @@ function CartButton(props) {
 
 /* 앨범 */
 function Album(props) {
-    // const [count, setCount] = useState(0)
-
     var countChange = function countChange() {
         props.onUpdate(props.i);
-        console.log(props.i);
     };
 
     return React.createElement(
         'div',
-        { className: 'col-md-2 col-sm-2 col-xs-2 product-grid album', 'data-category': props.e.category,
+        { className: 'col-2 product-grid album', 'data-category': props.e.category,
             'data-name': props.e.albumName, 'data-idx': props.i + 1 },
         React.createElement(
             'div',
@@ -129,8 +120,7 @@ var AlbumList = function (_React$Component) {
         var _this = _possibleConstructorReturn(this, (AlbumList.__proto__ || Object.getPrototypeOf(AlbumList)).call(this, props));
 
         _this.state = {
-            data: [],
-            menus: []
+            data: []
         };
 
         _this.changeCountData = _this.changeCountData.bind(_this);
@@ -140,39 +130,7 @@ var AlbumList = function (_React$Component) {
     _createClass(AlbumList, [{
         key: 'componentWillMount',
         value: function componentWillMount() {
-            var _this2 = this;
-
-            fetch('/music_data.json').then(function (res) {
-                return res.json();
-            }).then(function (json) {
-                json.data.sort(function (a, b) {
-                    return a.release > b.release ? -1 : 1;
-                });
-
-                _this2.setState({ data: json.data });
-
-                var menuArr = ['발라드'];
-                var menus = '';
-                var items = '';
-
-                /* json 데이터를 돌아가면서 보여주기 */
-                json.data.filter(function (e, i) {
-                    if ($.inArray(e.category, menuArr) === -1) {
-                        menuArr.push(e.category);
-                        menus += ' <li>\n                        <a href="#"><i class="fa fa-youtube-play fa-2x"></i> <span>' + e.category + '</span></a>\n                    </li>';
-                    }
-
-                    items += '<tr data-idx="' + (i + 1) + '" style="display: none;">\n                                            <td class="albuminfo">\n                                                <img src="/images/' + e.albumJaketImage + '">\n                                                <div class="info">\n                                                    <h4>' + e.albumName + '</h4>\n                                                    <span>\n                                                        <i class="fa fa-microphone"> \uC544\uD2F0\uC2A4\uD2B8</i> \n                                                        <p>' + e.artist + '</p>\n                                                    </span>\n                                                    <span>\n                                                        <i class="fa  fa-calendar"> \uBC1C\uB9E4\uC77C</i> \n                                                        <p>' + e.release + '</p>\n                                                    </span>\n                                                </div>\n                                            </td>\n                                            <td class="albumprice">\n                                                \uFFE6 ' + num(e.price).toLocaleString() + '\n                                            </td>\n                                            <td class="albumqty">\n                                                <input type="number" class="form-control" min="1" value="0">\n                                            </td>\n                                            <td class="pricesum">\n                                                \uFFE6 0\n                                            </td>\n                                            <td>\n                                                <button class="btn btn-default">\n                                                    <i class="fa fa-trash-o"></i> \uC0AD\uC81C\n                                                </button>\n                                            </td>\n                                        </tr>';
-
-                    /* 갯수 정보 추가 */
-                    _this2.state.data[i].count = 0;
-                });
-
-                $('.nav').append(menus);
-
-                /* 아이템 목록 추가 */
-                $('.modal tbody').html(items);
-            });
+            this.setState({ data: data });
         }
     }, {
         key: 'componentDidMount',
@@ -189,43 +147,29 @@ var AlbumList = function (_React$Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
+            var _this2 = this;
 
             console.log(this.state.data);
 
             /* 저거 할 때 중괄호 넣으면 안됀다... 중괄호 안넣어서 2시간 동안 고민함;;; */
             var list = this.state.data.map(function (e, i) {
-                return React.createElement(Album, { onUpdate: _this3.changeCountData, key: i, e: e, i: i });
+                return React.createElement(Album, { onUpdate: _this2.changeCountData, key: i, e: e, i: i });
             });
 
             console.log(list);
 
             // 발매일 내림차순
-            return React.createElement(
-                'div',
-                null,
-                list
-            );
+            return list;
         }
     }]);
 
     return AlbumList;
 }(React.Component);
 
-// function AlbumData(props) {
-//     return (
-//         <span>
-//             <i className="fa fa-money"> 가격</i>
-//             <p>￦{props.e.price.toLocaleString()}</p>
-//         </span>
-//     )
-// }
-
-
 /* 비동기적으로 데이터 처리 */
 
 
-fetch('/music_data.json').then(function (res) {
+fetch('/music_data_org.json').then(function (res) {
     return res.json();
 }).then(function (json) {
     json.data.sort(function (a, b) {
@@ -234,6 +178,34 @@ fetch('/music_data.json').then(function (res) {
 
     data = json.data;
 
-    var domContainer = document.querySelector('.contents');
+    /* 앨범목록 처리하기 */
+    var domContainer = document.querySelector('.albums');
     ReactDOM.render(e(AlbumList), domContainer);
+
+    /* 메뉴 정리하기 */
+    var menuArr = ['발라드'];
+    var menus = '';
+    var items = '';
+
+    /* json 데이터를 돌아가면서 보여주기 */
+    data.filter(function (e, i) {
+        data[i].count = 0;
+
+        if ($.inArray(e.category, menuArr) === -1) {
+            menuArr.push(e.category);
+
+            /* menu 목록, 이 부분도 React로 처리하기 */
+
+            menus += '<li class="list-group-item"><i class="fas fa-play-circle"></i> <span>' + e.category + '</span></li>';
+        }
+
+        /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
+        items += '<tr data-idx="' + (i + 1) + '" style="display: none;">\n                                            <td class="albuminfo">\n                                                <img src="/images/' + e.albumJaketImage + '">\n                                                <div class="info">\n                                                    <h4>' + e.albumName + '</h4>\n                                                    <span>\n                                                        <i class="fa fa-microphone"> \uC544\uD2F0\uC2A4\uD2B8</i> \n                                                        <p>' + e.artist + '</p>\n                                                    </span>\n                                                    <span>\n                                                        <i class="fa  fa-calendar"> \uBC1C\uB9E4\uC77C</i> \n                                                        <p>' + e.release + '</p>\n                                                    </span>\n                                                </div>\n                                            </td>\n                                            <td class="albumprice">\n                                                \uFFE6 ' + num(e.price).toLocaleString() + '\n                                            </td>\n                                            <td class="albumqty">\n                                                <input type="number" class="form-control" min="1" value="0">\n                                            </td>\n                                            <td class="pricesum">\n                                                \uFFE6 0\n                                            </td>\n                                            <td>\n                                                <button class="btn btn-default">\n                                                    <i class="fa fa-trash-o"></i> \uC0AD\uC81C\n                                                </button>\n                                            </td>\n                                        </tr>';
+    });
+
+    /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
+    $('#main-menu').append(menus);
+
+    /* 아이템 목록 추가 */
+    $('.modal tbody').html(items);
 });
