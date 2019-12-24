@@ -100,7 +100,8 @@ function Album(props) {
                         'p',
                         null,
                         '\uFFE6',
-                        props.e.price.toLocaleString()
+                        comma(props.e.price),
+                        '\uC6D0'
                     )
                 ),
                 React.createElement(CartButton, { onCountChange: countChange, count: props.e.count })
@@ -166,10 +167,135 @@ var AlbumList = function (_React$Component) {
     return AlbumList;
 }(React.Component);
 
+/* APP */
+
+
+var App = function (_React$Component2) {
+    _inherits(App, _React$Component2);
+
+    function App(props) {
+        _classCallCheck(this, App);
+
+        var _this3 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+        _this3.state = {
+            selCategory: 'ALL',
+            searchKeyword: ''
+        };
+        return _this3;
+    }
+
+    _createClass(App, [{
+        key: 'render',
+        value: function render() {
+            return "<div></div>";
+        }
+    }]);
+
+    return App;
+}(React.Component);
+
+/* 메뉴 목록 */
+
+
+function Category(props) {
+    var activeMenu = function activeMenu() {
+        props.onActive(props.i);
+    };
+
+    if (props.i === 0) {
+        return React.createElement(
+            'li',
+            { className: 'list-group-item ' + props.active, onClick: activeMenu },
+            React.createElement('i', { className: 'fa fa-th-list' }),
+            ' ',
+            React.createElement(
+                'span',
+                null,
+                props.category
+            )
+        );
+    } else {
+        return React.createElement(
+            'li',
+            { className: 'list-group-item ' + props.active, onClick: activeMenu },
+            React.createElement('i', { className: 'fas fa-play-circle' }),
+            ' ',
+            React.createElement(
+                'span',
+                null,
+                props.category
+            )
+        );
+    }
+}
+
+var menuArr = ['ALL', '발라드'];
+var activeArr = ['active-menu', ''];
+
+/* TODO 카테고리 리스트를 만들때 앞의 아이콘을 ALL 이랑 기본에 차이를 두고 싶다.. props으로 장난질 쳐야하는 것인가? */
+
+var CategoryList = function (_React$Component3) {
+    _inherits(CategoryList, _React$Component3);
+
+    function CategoryList(props) {
+        _classCallCheck(this, CategoryList);
+
+        var _this4 = _possibleConstructorReturn(this, (CategoryList.__proto__ || Object.getPrototypeOf(CategoryList)).call(this, props));
+
+        _this4.state = {
+            activeArr: []
+        };
+
+        _this4.toggleActive = _this4.toggleActive.bind(_this4);
+        return _this4;
+    }
+
+    _createClass(CategoryList, [{
+        key: 'componentWillMount',
+        value: function componentWillMount() {
+            this.setState({ activeArr: activeArr });
+        }
+
+        /* 메뉴 액티브 관련 */
+
+    }, {
+        key: 'toggleActive',
+        value: function toggleActive(i) {
+            var newActiveArr = this.state.activeArr;
+
+            newActiveArr.filter(function (e, i) {
+                newActiveArr[i] = '';
+            });
+
+            newActiveArr[i] = newActiveArr[i] === 'active-menu' ? '' : 'active-menu';
+
+            this.setState({
+                activeArr: newActiveArr
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this5 = this;
+
+            var categories = menuArr.map(function (menu, index) {
+                return React.createElement(Category, { key: index, onActive: _this5.toggleActive,
+                    active: activeArr[index], i: index,
+                    category: menu });
+            });
+
+            return categories;
+        }
+    }]);
+
+    return CategoryList;
+}(React.Component);
+
 /* 비동기적으로 데이터 처리 */
 
 
-fetch('/music_data_org.json').then(function (res) {
+fetch('/music_data.json').then(function (res) {
     return res.json();
 }).then(function (json) {
     json.data.sort(function (a, b) {
@@ -183,8 +309,6 @@ fetch('/music_data_org.json').then(function (res) {
     ReactDOM.render(e(AlbumList), domContainer);
 
     /* 메뉴 정리하기 */
-    var menuArr = ['발라드'];
-    var menus = '';
     var items = '';
 
     /* json 데이터를 돌아가면서 보여주기 */
@@ -193,10 +317,7 @@ fetch('/music_data_org.json').then(function (res) {
 
         if ($.inArray(e.category, menuArr) === -1) {
             menuArr.push(e.category);
-
-            /* menu 목록, 이 부분도 React로 처리하기 */
-
-            menus += '<li class="list-group-item"><i class="fas fa-play-circle"></i> <span>' + e.category + '</span></li>';
+            activeArr.push('');
         }
 
         /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
@@ -204,8 +325,28 @@ fetch('/music_data_org.json').then(function (res) {
     });
 
     /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
-    $('#main-menu').append(menus);
+    ReactDOM.render(e(CategoryList), document.querySelector('#main-menu'));
 
     /* 아이템 목록 추가 */
     $('.modal tbody').html(items);
 });
+
+var comma = function comma(str) {
+    console.log(str);
+
+    // 7
+    var start = str.length % 3;
+    var len = str.length;
+    console.log(len, start);
+
+    /* substr 을 하면 안된다.. 이유는 알아서 찾아봐; */
+    var newStr = str.substring(0, start);
+
+    while (start < len) {
+        if (newStr !== "") newStr += ",";
+        newStr += str.substring(start, start + 3);
+        start += 3;
+    }
+
+    return newStr;
+};

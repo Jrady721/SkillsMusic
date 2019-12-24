@@ -17,7 +17,7 @@ body { overflow-x: hidden; }
 .search input:nth-of-type(1) { height: 40px; }
 
 /* list */
-/*.active-menu {background-color: #c90000 !important}*/
+.active-menu {background-color: #c90000; color: white; }
 
 @media (min-width: 768px) {
     #page-wrapper {margin: 0 0 0 260px;padding: 15px 30px;min-height: 1200px}

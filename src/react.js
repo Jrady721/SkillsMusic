@@ -32,6 +32,7 @@ function Album(props) {
         props.onUpdate(props.i)
     }
 
+
     return (
         <div className="col-2 product-grid album" data-category={props.e.category}
              data-name={props.e.albumName} data-idx={props.i + 1}>
@@ -51,7 +52,7 @@ function Album(props) {
                     </span>
                     <span>
                         <i className="fa fa-money"> 가격</i>
-                        <p>￦{props.e.price.toLocaleString()}</p>
+                        <p>￦{comma(props.e.price)}원</p>
                     </span>
                     <CartButton onCountChange={countChange} count={props.e.count}/>
                 </div>
@@ -101,8 +102,90 @@ class AlbumList extends React.Component {
     }
 }
 
+/* APP */
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selCategory: 'ALL',
+            searchKeyword: ''
+        }
+    }
+
+    render() {
+        return (
+            "<div></div>"
+        )
+    }
+}
+
+/* 메뉴 목록 */
+function Category(props) {
+    const activeMenu = () => {
+        props.onActive(props.i)
+    }
+
+    if (props.i === 0) {
+        return (
+            <li className={'list-group-item ' + props.active} onClick={activeMenu}>
+                <i className="fa fa-th-list"></i> <span>{props.category}</span>
+            </li>
+        )
+    } else {
+        return (
+            <li className={'list-group-item ' + props.active} onClick={activeMenu}>
+                <i className="fas fa-play-circle"></i> <span>{props.category}</span>
+            </li>
+        )
+    }
+}
+
+let menuArr = ['ALL', '발라드']
+let activeArr = ['active-menu', '']
+
+/* TODO 카테고리 리스트를 만들때 앞의 아이콘을 ALL 이랑 기본에 차이를 두고 싶다.. props으로 장난질 쳐야하는 것인가? */
+class CategoryList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            activeArr: []
+        }
+
+        this.toggleActive = this.toggleActive.bind(this)
+    }
+
+    componentWillMount() {
+        this.setState({activeArr: activeArr})
+    }
+
+    /* 메뉴 액티브 관련 */
+    toggleActive(i) {
+        let newActiveArr = this.state.activeArr
+
+        newActiveArr.filter((e, i) => {
+            newActiveArr[i] = ''
+        })
+
+        newActiveArr[i] = newActiveArr[i] === 'active-menu' ? '' : 'active-menu'
+
+        this.setState({
+            activeArr: newActiveArr
+        })
+    }
+
+    render() {
+        const categories = menuArr.map((menu, index) => <Category key={index} onActive={this.toggleActive}
+                                                                  active={activeArr[index]} i={index}
+                                                                  category={menu}/>)
+
+        return (categories)
+    }
+}
+
 /* 비동기적으로 데이터 처리 */
-fetch('/music_data_org.json').then(res => res.json()).then(json => {
+fetch('/music_data.json').then(res => res.json()).then(json => {
     json.data.sort(function (a, b) {
         return a.release > b.release ? -1 : 1;
     });
@@ -114,8 +197,6 @@ fetch('/music_data_org.json').then(res => res.json()).then(json => {
     ReactDOM.render(e(AlbumList), domContainer)
 
     /* 메뉴 정리하기 */
-    let menuArr = ['발라드']
-    let menus = ''
     let items = ''
 
     /* json 데이터를 돌아가면서 보여주기 */
@@ -124,10 +205,7 @@ fetch('/music_data_org.json').then(res => res.json()).then(json => {
 
         if ($.inArray(e.category, menuArr) === -1) {
             menuArr.push(e.category)
-
-            /* menu 목록, 이 부분도 React로 처리하기 */
-
-            menus += `<li class="list-group-item"><i class="fas fa-play-circle"></i> <span>${e.category}</span></li>`
+            activeArr.push('')
         }
 
         /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
@@ -163,10 +241,29 @@ fetch('/music_data_org.json').then(res => res.json()).then(json => {
                                         </tr>`
     })
 
-
     /* APPEND 사용하지 말자.. 다 React Component 형태로 변경하기 */
-    $('#main-menu').append(menus)
+    ReactDOM.render(e(CategoryList), document.querySelector('#main-menu'))
 
     /* 아이템 목록 추가 */
     $('.modal tbody').html(items)
 })
+
+const comma = (str) => {
+    console.log(str)
+
+    // 7
+    let start = (str.length % 3)
+    let len = str.length
+    console.log(len, start);
+
+    /* substr 을 하면 안된다.. 이유는 알아서 찾아봐; */
+    let newStr = str.substring(0, start)
+
+    while (start < len) {
+        if (newStr !== "") newStr += ",";
+        newStr += str.substring(start, start + 3);
+        start += 3;
+    }
+
+    return newStr;
+}
