@@ -10,100 +10,10 @@
 
     <!-- CUSTOM -->
     <link href="/assets/css/style.css" rel="stylesheet"/>
-
-
 </head>
 <body>
-<!-- APP -->
-<div id="app">
-    <!-- modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="myModalLabel">장바구니</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead class="thead-dark">
-                        <tr>
-                            <th>앨범정보</th>
-                            <th>가격</th>
-                            <th>수량</th>
-                            <th>합계</th>
-                            <th>삭제</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td class="albuminfo">
-                                <img src="images/20162259.jpg" alt="img">
-                                <div class="info">
-                                    <h4>Lovelyz 4th Mini AlbumLovelyz 4th Mini Album</h4>
-                                    <span>
-                                        <i class="fa fa-microphone"> 아티스트</i>
-                                        <p>러블리즈(Lovelyz)</p>
-                                    </span>
-                                    <span>
-                                        <i class="fa  fa-calendar"> 발매일</i>
-                                        <p>2018.04.23</p>
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="albumprice">￦ 20,000</td>
-                            <td class="albumqty">
-                                <label>
-                                    <input type="number" class="form-control" value="1">
-                                </label>
-                            </td>
-                            <td class="pricesum">￦ 20,000</td>
-                            <td>
-                                <button class="btn btn-sm btn-secondary">
-                                    <i class="fa fa-trash-o"></i> 삭제
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <div class="totalprice text-right">
-                        <h6>총 합계금액 : <span>￦20,000</span> 원</h6>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">닫기</button>
-                    <button type="button" class="btn btn-sm btn-dark">결제하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- navigation bar -->
-    <header>
-        <nav class="navbar navbar-dark bg-dark navbar-expand" role="navigation">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="index.html">SKILLS MUSIC</a>
-                <button class="btn btn-sm btn-secondary ml-auto" data-toggle="modal" data-target="#myModal">
-                    <i class="fa fa-shopping-cart"></i> 장바구니 <strong class="cart-count">0</strong> 개 금액 ￦<span
-                        class="cart-price">0</span>원
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- main -->
-    <main>
-        <!-- REACT APP -->
-    </main>
-
-    <!-- footer -->
-    <footer>
-
-    </footer>
-</div>
-<!-- /. APP  -->
-
+<!-- app -->
+<div id="app"></div>
 
 <!-- JavaScripts -->
 <script src="assets/js/jquery-3.4.1.js"></script>
@@ -122,6 +32,9 @@
 
 <!-- 만든 React 컴포넌트를 실행. -->
 <!--    <script src="/assets/js/react.js" type="text/babel"></script>-->
+
+<!-- 위의코드 대신 npx babel --watch src --out-dir ./assets/js --presets react-app/prod 사용중... -->
+
 <script src="/assets/js/react.js"></script>
 </body>
 </html>
