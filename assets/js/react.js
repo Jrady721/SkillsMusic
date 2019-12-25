@@ -61,7 +61,7 @@ function Album(props) {
                 ),
                 React.createElement(
                     'div',
-                    { className: 'produ-cost' },
+                    { className: 'product-cost' },
                     React.createElement(
                         'h5',
                         null,
@@ -258,7 +258,7 @@ function CartItem(props) {
             { 'data-idx': props.i + 1 },
             React.createElement(
                 'td',
-                { className: 'albuminfo' },
+                { className: 'album-info' },
                 React.createElement('img', { src: '/images/' + props.e.albumJaketImage, alt: 'img' }),
                 React.createElement(
                     'div',
@@ -300,14 +300,14 @@ function CartItem(props) {
             ),
             React.createElement(
                 'td',
-                { className: 'albumqty' },
+                { className: 'album-qty' },
                 React.createElement('input', { type: 'number', className: 'form-control', min: 1, defaultValue: props.e.count,
                     value: props.e.count,
                     onChange: updateCartItem })
             ),
             React.createElement(
                 'td',
-                { className: 'pricesum' },
+                { className: 'price-sum' },
                 '\uFFE6 ',
                 props.e.count * props.e.price
             ),
@@ -695,7 +695,7 @@ var App = function (_React$Component2) {
                             ),
                             React.createElement(
                                 'div',
-                                { className: 'col-10 pt-3' },
+                                { className: 'col-10 right-side pt-3' },
                                 React.createElement(
                                     'div',
                                     { className: 'row' },

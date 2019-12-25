@@ -45,7 +45,7 @@ function Album(props) {
                         <img className="img-responsive" src={'/images/' + props.e.albumJaketImage}
                              alt={props.e.albumName}/>
                     </div>
-                    <div className="produ-cost">
+                    <div className="product-cost">
                         <h5>{props.e.albumName}</h5>
                         <span>
                         <i className="fa fa-microphone"> 아티스트</i>
@@ -170,7 +170,7 @@ function CartItem(props) {
     if (props.e.count) {
         return (
             <tr data-idx={props.i + 1}>
-                <td className="albuminfo">
+                <td className="album-info">
                     <img src={'/images/' + props.e.albumJaketImage} alt="img"/>
                     <div className="info">
                         <h6 className={'text-truncate'}>{props.e.albumName}</h6>
@@ -187,13 +187,13 @@ function CartItem(props) {
                 <td className="albumprice">
                     ￦ {comma(props.e.price)}
                 </td>
-                <td className="albumqty">
+                <td className="album-qty">
                     {/* value 대신 defaultValue 를 사용하라고 하는데;; 잘 모르겠다. */}
                     <input type="number" className="form-control" min={1} defaultValue={props.e.count}
                            value={props.e.count}
                            onChange={updateCartItem}/>
                 </td>
-                <td className="pricesum">
+                <td className="price-sum">
                     ￦ {props.e.count * props.e.price}
                 </td>
                 <td>
@@ -471,7 +471,7 @@ class App extends React.Component {
                                 <CategoryList changeCategory={this.categoryUpdate}/>
                             </div>
                             {/*right side*/}
-                            <div className="col-10 pt-3">
+                            <div className="col-10 right-side pt-3">
                                 {/*right-side__header*/}
                                 <div className="row">
                                     <div className="col-12">
