@@ -440,7 +440,7 @@ class App extends React.Component {
                 <header>
                     <nav className="navbar navbar-dark bg-dark navbar-expand" role="navigation">
                         <div className="container-fluid">
-                            <a className="navbar-brand" href="/">SKILLS MUSIC</a>
+                            <a className="navbar-brand" href="/">J-MUSIC</a>
                             <ShowCartButton albums={this.state.albums}/>
                         </div>
                     </nav>

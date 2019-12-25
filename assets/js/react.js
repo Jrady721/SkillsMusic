@@ -649,7 +649,7 @@ var App = function (_React$Component2) {
                             React.createElement(
                                 'a',
                                 { className: 'navbar-brand', href: '/' },
-                                'SKILLS MUSIC'
+                                'J-MUSIC'
                             ),
                             React.createElement(ShowCartButton, { albums: this.state.albums })
                         )
