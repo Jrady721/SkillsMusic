@@ -19,8 +19,10 @@ body { overflow-x: hidden; }
 .active-menu {background-color: #c90000; color: white; }
 
 
-.product-items {border: 1px solid #ccc;box-shadow: 0 0 2px 1px rgba(0, 0, 0, .15);margin-bottom: 3em}
+/* .right-side */
+.empty { display: none; min-height: 600px;  }
 
+.product-items {border: 1px solid #ccc;box-shadow: 0 0 2px 1px rgba(0, 0, 0, .15);margin-bottom: 3em}
 .produ-cost {font-size: 1em;padding: 1rem;background: #337ab7}
 
 .produ-cost h4 {font-size: 1.2em;color: #fff;margin-bottom: .5em;font-family: 'Carrois Gothic', sans-serif}

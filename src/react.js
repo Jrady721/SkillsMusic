@@ -110,9 +110,7 @@ class AlbumList extends React.Component {
         return (
             <div className="albums row">
                 {/*내용이 비어있을 경우*/}
-                <h1 className="empty" style={{display: 'none', textAlign: 'center', marginTop: '250px'}}>
-                    검색된 앨범이 없습니다.
-                </h1>
+                <h5 className="empty col-12">검색된 앨범이 없습니다.</h5>
                 {list}
             </div>
         )
@@ -277,16 +275,16 @@ function CartModal(props) {
     )
 }
 
+/* TODO 화면이 업데이트 할 때마다 localStorage 든지 뭐든지 저장하자. 화면이 유지되게, 그리고 다시 접속했을떄 정보가 있으면 그 정보 보여주는 형식으로 처리. */
+
 /* 카테고리 Context */
+/* 나중에 context 완벽히 이해해서 사용하자.. */
 const CategoryContext = React.createContext('ALL')
 
 /* APP */
 class App extends React.Component {
-
     constructor(props) {
         super(props);
-
-        /* 나중에 context 완벽히 이해해서 사용하자.. */
 
         this.state = {
             selCategory: 'ALL',
@@ -300,6 +298,8 @@ class App extends React.Component {
         this.deleteCartItem = this.deleteCartItem.bind(this)
         this.updateCartItem = this.updateCartItem.bind(this)
         this.paymentCart = this.paymentCart.bind(this)
+
+        this.sarchAlbum = this.sarchAlbum.bind(this)
     }
 
     componentWillMount() {
@@ -322,8 +322,54 @@ class App extends React.Component {
         this.setState({
             albums: newAlbums
         })
+    }
 
-        console.log(newAlbums)
+    componentWillUpdate(nextProps, nextState) {
+    }
+
+    /* 컴포넌트 수정되었을 때... 검색관련 처리하기 */
+    /* TODO 사실상 jQuery를 이용해서 개발한 것... React 로 완전히 수정하자 */
+    componentDidUpdate(prevProps, prevState) {
+        let keyword = this.state.searchKeyword
+
+        let view = `[data-category="${this.state.selCategory}"]`
+        if (this.state.selCategory === 'ALL') view = ''
+
+        $('.album').hide()
+
+        // 하이라이트 제거
+        $('mark').filter(function (i, e) {
+            let text = $(e).parent().text()
+            $(e).parent().text(text)
+        })
+
+        if (keyword) {
+            let reg = new RegExp(keyword, 'g')
+
+            $(`.album${view}`).filter(function (i, e) {
+                let name = $(e).find(`h5:contains(${keyword})`).text()
+                let artist = $(e).find(`.artist:contains(${keyword})`).text()
+
+                if (name || artist) {
+                    $(e).show()
+
+                    if (name) {
+                        name = name.replace(reg, `<mark>${keyword}</mark>`)
+                        $(e).find('h5').html(name)
+                    }
+
+                    if (artist) {
+                        artist = artist.replace(reg, `<mark>${keyword}</mark>`)
+                        $(e).find('.artist').html(artist)
+                    }
+                }
+            })
+        } else {
+            $(`.album${view}`).show()
+        }
+
+        // 검색 앨범이 없을 시
+        $('.album:visible').length ? $('.empty').hide() : $('.empty').show()
     }
 
     /* 카테고리 업데이트를 한다. */
@@ -338,7 +384,7 @@ class App extends React.Component {
             albums: newAlbums
         })
 
-        /* 보이는 앨범도 업데이트 하자.. */
+        /* 보이는 앨범도 업데이트 하자.. (이미 검색 기록이 있을 경우) */
     }
 
     deleteCartItem(i) {
@@ -373,8 +419,14 @@ class App extends React.Component {
         })
 
         alert('결제가 완료되었습니다.')
-
         /* 결제 완료 후 모달을 닫을까?? 고민중.. */
+    }
+
+    /* 검색 기능 구현 */
+    sarchAlbum(e) {
+        this.setState({
+            searchKeyword: e.target.value
+        })
     }
 
     render() {
@@ -404,7 +456,8 @@ class App extends React.Component {
                                 {/*검색*/}
                                 <div className="search">
                                     <div className="form-group input-group">
-                                        <input type="text" className="form-control" placeholder="앨범검색"/>
+                                        <input onInput={this.sarchAlbum} type="text" className="form-control"
+                                               placeholder="앨범검색"/>
                                         <div className="input-group-append">
                                             <div className="input-group-text">
                                                 <button className="btn btn-default" type="button"><i
