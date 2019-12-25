@@ -82,7 +82,7 @@ class AlbumList extends React.Component {
     }
 
     componentWillMount() {
-        this.setState({data: data})
+        this.setState({data: this.props.albums})
     }
 
     componentDidMount() {
@@ -90,9 +90,8 @@ class AlbumList extends React.Component {
     }
 
     changeCountData(i) {
-        console.log(this.state)
         let newData = this.state.data
-        newData[i].count = newData[i].count + 1
+        newData[i].count = Number(newData[i].count) + 1
 
         this.setState({data: newData})
 
@@ -122,11 +121,159 @@ class AlbumList extends React.Component {
 
 /* 장바구니 모달 버튼 */
 function ShowCartButton(props) {
+    let count = 0
+    let price = 0
+
+    props.albums.filter((e, i) => {
+        count += Number(e.count)
+        price += Number(e.count * e.price)
+    })
+
     return (
         <button className="btn btn-sm btn-secondary ml-auto" data-toggle="modal" data-target="#myModal">
-            <i className="fa fa-shopping-cart"/> 장바구니 <strong className="cart-count">{comma(props.cnt)}</strong> 개 금액
-            ￦<span className="cart-price">{comma(props.price)}</span>원
+            <i className="fa fa-shopping-cart"/> 장바구니 <strong className="cart-count">{count}</strong> 개 금액
+            ￦<span className="cart-price">{comma(price)}</span>원
         </button>
+    )
+}
+
+function CartList(props) {
+    console.log("LIST", props)
+
+    const deleteCartItem = (i) => {
+        props.deleteCartItem(i)
+    }
+
+    const updateCartItem = (i, val) => {
+        props.updateCartItem(i, val)
+    }
+
+    const list = props.albums.map((e, i) => (
+        <CartItem deleteCartItem={deleteCartItem} updateCartItem={updateCartItem} key={i} i={i} e={e}/>))
+    return (list)
+}
+
+/**
+ * @return {null}
+ */
+function CartItem(props) {
+    /* 카트 아이템 삭제 */
+    const deleteCartItem = () => {
+        props.deleteCartItem(props.i)
+    }
+
+    /* 카트 수량 및 전체 그거 수정하기 */
+    const updateCartItem = (e) => {
+        let val = e.target.value
+        console.log(e.target.value);
+        props.updateCartItem(props.i, val)
+    }
+
+    if (props.e.count) {
+        return (
+            <tr data-idx={props.i + 1}>
+                <td className="albuminfo">
+                    <img src={'/images/' + props.e.albumJaketImage} alt="img"/>
+                    <div className="info">
+                        <h6 className={'text-truncate'}>{props.e.albumName}</h6>
+                        <div className={'d-flex mb-1'}>
+                            <i className="fa fa-microphone"/>&nbsp;아티스트&nbsp;
+                            <p className={'mb-0'}>{props.e.artist}</p>
+                        </div>
+                        <div className={'d-flex'}>
+                            <i className="fa fa-calendar"/>&nbsp;발매일&nbsp;
+                            <p className={'mb-0'}>{props.e.release}</p>
+                        </div>
+                    </div>
+                </td>
+                <td className="albumprice">
+                    ￦ {comma(props.e.price)}
+                </td>
+                <td className="albumqty">
+                    {/* value 대신 defaultValue 를 사용하라고 하는데;; 잘 모르겠다. */}
+                    <input type="number" className="form-control" min={1} defaultValue={props.e.count}
+                           value={props.e.count}
+                           onChange={updateCartItem}/>
+                </td>
+                <td className="pricesum">
+                    ￦ {props.e.count * props.e.price}
+                </td>
+                <td>
+                    <button className="btn btn-sm btn-danger" onClick={deleteCartItem}>
+                        <i className="fa fa-trash-o"/> 삭제
+                    </button>
+                </td>
+            </tr>
+        )
+    } else {
+        return null
+    }
+}
+
+function CartModal(props) {
+    let totalPrice = 0
+
+    props.albums.filter((e, i) => {
+        totalPrice += e.price * e.count
+    })
+
+    /* 카트 아이템 삭제 */
+    const deleteCartItem = (i) => {
+        props.deleteCartItem(i)
+    }
+
+    /* 카트 수량 및 전체 그거 수정하기 */
+    const updateCartItem = (i, val) => {
+        props.updateCartItem(i, val)
+    }
+
+    const paymentCart = () => {
+        props.paymentCart()
+    }
+
+    return (
+        <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="myModalLabel">장바구니</h5>
+                        <button type="button" className="close" data-dismiss="modal"
+                                aria-hidden="true">&times;</button>
+                    </div>
+
+                    <div className="modal-body">
+                        <table className="table table-bordered">
+                            <thead className="thead-dark">
+                            <tr>
+                                <th>앨범정보</th>
+                                <th>가격</th>
+                                <th>수량</th>
+                                <th>합계</th>
+                                <th>삭제</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            {/* 장바구니 아이템 목록 */}
+                            <CartList deleteCartItem={deleteCartItem} updateCartItem={updateCartItem}
+                                      albums={props.albums}/>
+
+                            </tbody>
+                        </table>
+                        <div className="total-price text-right">
+                            <h6>총 합계금액 : ￦<span>{comma(totalPrice)}</span> 원</h6>
+                        </div>
+                    </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-sm btn-secondary" data-dismiss="modal">닫기
+                        </button>
+                        <button type="button" className="btn btn-sm btn-dark" onClick={paymentCart}>결제하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     )
 }
 
@@ -143,15 +290,16 @@ class App extends React.Component {
 
         this.state = {
             selCategory: 'ALL',
-            cntCart: 0,
-            priceCart: 0,
             searchKeyword: '',
-            albums: [],
-            cartAlbums: []
+            albums: []
         }
 
         this.categoryUpdate = this.categoryUpdate.bind(this)
         this.cartUpdate = this.cartUpdate.bind(this)
+
+        this.deleteCartItem = this.deleteCartItem.bind(this)
+        this.updateCartItem = this.updateCartItem.bind(this)
+        this.paymentCart = this.paymentCart.bind(this)
     }
 
     componentWillMount() {
@@ -161,14 +309,21 @@ class App extends React.Component {
     cartUpdate(album) {
         console.log('cart update')
 
-        let newCartAlbums = this.state.cartAlbums
-        newCartAlbums.push(album)
+        let newAlbums = this.state.albums
+
+        let chkNewItem = true
+        newAlbums.filter((e, i) => {
+            if (e.albumName === album.albumName) {
+                chkNewItem = false
+                return false
+            }
+        })
 
         this.setState({
-            cntCart: Number(this.state.cntCart) + 1,
-            priceCart: Number(this.state.priceCart) + Number(album.price),
-            cartAlbums: newCartAlbums
+            albums: newAlbums
         })
+
+        console.log(newAlbums)
     }
 
     /* 카테고리 업데이트를 한다. */
@@ -186,80 +341,55 @@ class App extends React.Component {
         /* 보이는 앨범도 업데이트 하자.. */
     }
 
+    deleteCartItem(i) {
+        console.log(i)
+        let newAlbums = this.state.albums
+
+        newAlbums[i].count = 0
+
+        this.setState({
+            albums: newAlbums
+        })
+    }
+
+    updateCartItem(i, val) {
+        let newAlbums = this.state.albums
+        newAlbums[i].count = val
+
+        this.setState({
+            albums: newAlbums
+        })
+    }
+
+    paymentCart() {
+        let newAlbums = this.state.albums
+
+        newAlbums.filter((e, i) => {
+            newAlbums[i].count = 0
+        })
+
+        this.setState({
+            albums: newAlbums
+        })
+
+        alert('결제가 완료되었습니다.')
+
+        /* 결제 완료 후 모달을 닫을까?? 고민중.. */
+    }
+
     render() {
         return (
             <CategoryContext.Provider value={this.state.selCategory}>
                 {/*modal*/}
-                <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel"
-                     aria-hidden="true">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="myModalLabel">장바구니</h5>
-                                <button type="button" className="close" data-dismiss="modal"
-                                        aria-hidden="true">&times;</button>
-                            </div>
-                            <div className="modal-body">
-                                <table className="table table-bordered">
-                                    <thead className="thead-dark">
-                                    <tr>
-                                        <th>앨범정보</th>
-                                        <th>가격</th>
-                                        <th>수량</th>
-                                        <th>합계</th>
-                                        <th>삭제</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td className="albuminfo">
-                                            <img src="/images/20162259.jpg" alt="img"/>
-                                            <div className="info">
-                                                <h4>Lovelyz 4th Mini AlbumLovelyz 4th Mini Album</h4>
-                                                <span>
-                                                        <i className="fa fa-microphone"> 아티스트</i>
-                                                        <p>러블리즈(Lovelyz)</p>
-                                                    </span>
-                                                <span>
-                                                        <i className="fa  fa-calendar"> 발매일</i>
-                                                        <p>2018.04.23</p>
-                                                    </span>
-                                            </div>
-                                        </td>
-                                        <td className="albumprice">￦ 20,000</td>
-                                        <td className="albumqty">
-                                            <label>
-                                                <input type="number" className="form-control" defaultValue="1"/>
-                                            </label>
-                                        </td>
-                                        <td className="pricesum">￦ 20,000</td>
-                                        <td>
-                                            <button className="btn btn-sm btn-secondary">
-                                                <i className="fa fa-trash-o"/> 삭제
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div className="totalprice text-right">
-                                    <h6>총 합계금액 : <span>￦20,000</span> 원</h6>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-sm btn-secondary" data-dismiss="modal">닫기
-                                </button>
-                                <button type="button" className="btn btn-sm btn-dark">결제하기</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <CartModal paymentCart={this.paymentCart} deleteCartItem={this.deleteCartItem}
+                           updateCartItem={this.updateCartItem}
+                           albums={this.state.albums}/>
                 {/* header */}
                 <header>
                     <nav className="navbar navbar-dark bg-dark navbar-expand" role="navigation">
                         <div className="container-fluid">
                             <a className="navbar-brand" href="/">SKILLS MUSIC</a>
-                            <ShowCartButton cnt={this.state.cntCart} price={this.state.priceCart}/>
+                            <ShowCartButton albums={this.state.albums}/>
                         </div>
                     </nav>
                 </header>
@@ -299,7 +429,7 @@ class App extends React.Component {
                                 <hr/>
 
                                 {/*앨범목록*/}
-                                <AlbumList onAddCart={this.cartUpdate}/>
+                                <AlbumList albums={this.state.albums} onAddCart={this.cartUpdate}/>
                             </div>
                         </div>
                     </div>
@@ -390,9 +520,6 @@ fetch('/music_data.json').then(res => res.json()).then(json => {
 
     data = json.data
 
-    /* 메뉴 정리하기 */
-    let items = ''
-
     /* json 데이터를 돌아가면서 보여주기 */
     data.filter((e, i) => {
         data[i].count = 0
@@ -401,44 +528,9 @@ fetch('/music_data.json').then(res => res.json()).then(json => {
             menuArr.push(e.category)
             activeArr.push('')
         }
-
-        /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
-        items += `<tr data-idx="${i + 1}" style={{display: 'none'}}>
-                    <td class="albuminfo">
-                        <img src="/images/${e.albumJaketImage}" alt="img">
-                        <div class="info">
-                            <h4>${e.albumName}</h4>
-                            <span>
-                                <i class="fa fa-microphone"> 아티스트</i> 
-                                <p>${e.artist}</p>
-                            </span>
-                            <span>
-                                <i class="fa  fa-calendar"> 발매일</i> 
-                                <p>${e.release}</p>
-                            </span>
-                        </div>
-                    </td>
-                    <td class="albumprice">
-                        ￦ ${num(e.price).toLocaleString()}
-                    </td>
-                    <td class="albumqty">
-                        <input type="number" class="form-control" min="1" value="0" />
-                    </td>
-                    <td class="pricesum">
-                        ￦ 0
-                    </td>
-                    <td>
-                        <button class="btn btn-default">
-                            <i class="fa fa-trash-o"/> 삭제
-                        </button>
-                    </td>
-                </tr>`
     })
 
     ReactDOM.render(e(App), document.querySelector('#app'))
-
-    /* 아이템 목록 추가 */
-    $('.modal tbody').html(items)
 })
 
 /* 콤마 찍기. */

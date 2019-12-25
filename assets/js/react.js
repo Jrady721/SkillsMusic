@@ -141,7 +141,7 @@ var AlbumList = function (_React$Component) {
     _createClass(AlbumList, [{
         key: 'componentWillMount',
         value: function componentWillMount() {
-            this.setState({ data: data });
+            this.setState({ data: this.props.albums });
         }
     }, {
         key: 'componentDidMount',
@@ -149,9 +149,8 @@ var AlbumList = function (_React$Component) {
     }, {
         key: 'changeCountData',
         value: function changeCountData(i) {
-            console.log(this.state);
             var newData = this.state.data;
-            newData[i].count = newData[i].count + 1;
+            newData[i].count = Number(newData[i].count) + 1;
 
             this.setState({ data: newData });
 
@@ -192,6 +191,14 @@ var AlbumList = function (_React$Component) {
 
 
 function ShowCartButton(props) {
+    var count = 0;
+    var price = 0;
+
+    props.albums.filter(function (e, i) {
+        count += Number(e.count);
+        price += Number(e.count * e.price);
+    });
+
     return React.createElement(
         'button',
         { className: 'btn btn-sm btn-secondary ml-auto', 'data-toggle': 'modal', 'data-target': '#myModal' },
@@ -200,15 +207,250 @@ function ShowCartButton(props) {
         React.createElement(
             'strong',
             { className: 'cart-count' },
-            comma(props.cnt)
+            count
         ),
         ' \uAC1C \uAE08\uC561 \uFFE6',
         React.createElement(
             'span',
             { className: 'cart-price' },
-            comma(props.price)
+            comma(price)
         ),
         '\uC6D0'
+    );
+}
+
+function CartList(props) {
+    console.log("LIST", props);
+
+    var deleteCartItem = function deleteCartItem(i) {
+        props.deleteCartItem(i);
+    };
+
+    var updateCartItem = function updateCartItem(i, val) {
+        props.updateCartItem(i, val);
+    };
+
+    var list = props.albums.map(function (e, i) {
+        return React.createElement(CartItem, { deleteCartItem: deleteCartItem, updateCartItem: updateCartItem, key: i, i: i, e: e });
+    });
+    return list;
+}
+
+/**
+ * @return {null}
+ */
+function CartItem(props) {
+    /* 카트 아이템 삭제 */
+    var deleteCartItem = function deleteCartItem() {
+        props.deleteCartItem(props.i);
+    };
+
+    /* 카트 수량 및 전체 그거 수정하기 */
+    var updateCartItem = function updateCartItem(e) {
+        var val = e.target.value;
+        console.log(e.target.value);
+        props.updateCartItem(props.i, val);
+    };
+
+    if (props.e.count) {
+        return React.createElement(
+            'tr',
+            { 'data-idx': props.i + 1 },
+            React.createElement(
+                'td',
+                { className: 'albuminfo' },
+                React.createElement('img', { src: '/images/' + props.e.albumJaketImage, alt: 'img' }),
+                React.createElement(
+                    'div',
+                    { className: 'info' },
+                    React.createElement(
+                        'h6',
+                        { className: 'text-truncate' },
+                        props.e.albumName
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'd-flex mb-1' },
+                        React.createElement('i', { className: 'fa fa-microphone' }),
+                        '\xA0\uC544\uD2F0\uC2A4\uD2B8\xA0',
+                        React.createElement(
+                            'p',
+                            { className: 'mb-0' },
+                            props.e.artist
+                        )
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'd-flex' },
+                        React.createElement('i', { className: 'fa fa-calendar' }),
+                        '\xA0\uBC1C\uB9E4\uC77C\xA0',
+                        React.createElement(
+                            'p',
+                            { className: 'mb-0' },
+                            props.e.release
+                        )
+                    )
+                )
+            ),
+            React.createElement(
+                'td',
+                { className: 'albumprice' },
+                '\uFFE6 ',
+                comma(props.e.price)
+            ),
+            React.createElement(
+                'td',
+                { className: 'albumqty' },
+                React.createElement('input', { type: 'number', className: 'form-control', min: 1, defaultValue: props.e.count,
+                    value: props.e.count,
+                    onChange: updateCartItem })
+            ),
+            React.createElement(
+                'td',
+                { className: 'pricesum' },
+                '\uFFE6 ',
+                props.e.count * props.e.price
+            ),
+            React.createElement(
+                'td',
+                null,
+                React.createElement(
+                    'button',
+                    { className: 'btn btn-sm btn-danger', onClick: deleteCartItem },
+                    React.createElement('i', { className: 'fa fa-trash-o' }),
+                    ' \uC0AD\uC81C'
+                )
+            )
+        );
+    } else {
+        return null;
+    }
+}
+
+function CartModal(props) {
+    var totalPrice = 0;
+
+    props.albums.filter(function (e, i) {
+        totalPrice += e.price * e.count;
+    });
+
+    /* 카트 아이템 삭제 */
+    var deleteCartItem = function deleteCartItem(i) {
+        props.deleteCartItem(i);
+    };
+
+    /* 카트 수량 및 전체 그거 수정하기 */
+    var updateCartItem = function updateCartItem(i, val) {
+        props.updateCartItem(i, val);
+    };
+
+    var paymentCart = function paymentCart() {
+        props.paymentCart();
+    };
+
+    return React.createElement(
+        'div',
+        { className: 'modal fade', id: 'myModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myModalLabel',
+            'aria-hidden': 'true' },
+        React.createElement(
+            'div',
+            { className: 'modal-dialog' },
+            React.createElement(
+                'div',
+                { className: 'modal-content' },
+                React.createElement(
+                    'div',
+                    { className: 'modal-header' },
+                    React.createElement(
+                        'h5',
+                        { className: 'modal-title', id: 'myModalLabel' },
+                        '\uC7A5\uBC14\uAD6C\uB2C8'
+                    ),
+                    React.createElement(
+                        'button',
+                        { type: 'button', className: 'close', 'data-dismiss': 'modal',
+                            'aria-hidden': 'true' },
+                        '\xD7'
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'modal-body' },
+                    React.createElement(
+                        'table',
+                        { className: 'table table-bordered' },
+                        React.createElement(
+                            'thead',
+                            { className: 'thead-dark' },
+                            React.createElement(
+                                'tr',
+                                null,
+                                React.createElement(
+                                    'th',
+                                    null,
+                                    '\uC568\uBC94\uC815\uBCF4'
+                                ),
+                                React.createElement(
+                                    'th',
+                                    null,
+                                    '\uAC00\uACA9'
+                                ),
+                                React.createElement(
+                                    'th',
+                                    null,
+                                    '\uC218\uB7C9'
+                                ),
+                                React.createElement(
+                                    'th',
+                                    null,
+                                    '\uD569\uACC4'
+                                ),
+                                React.createElement(
+                                    'th',
+                                    null,
+                                    '\uC0AD\uC81C'
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'tbody',
+                            null,
+                            React.createElement(CartList, { deleteCartItem: deleteCartItem, updateCartItem: updateCartItem,
+                                albums: props.albums })
+                        )
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'total-price text-right' },
+                        React.createElement(
+                            'h6',
+                            null,
+                            '\uCD1D \uD569\uACC4\uAE08\uC561 : \uFFE6',
+                            React.createElement(
+                                'span',
+                                null,
+                                comma(totalPrice)
+                            ),
+                            ' \uC6D0'
+                        )
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'modal-footer' },
+                    React.createElement(
+                        'button',
+                        { type: 'button', className: 'btn btn-sm btn-secondary', 'data-dismiss': 'modal' },
+                        '\uB2EB\uAE30'
+                    ),
+                    React.createElement(
+                        'button',
+                        { type: 'button', className: 'btn btn-sm btn-dark', onClick: paymentCart },
+                        '\uACB0\uC81C\uD558\uAE30'
+                    )
+                )
+            )
+        )
     );
 }
 
@@ -229,15 +471,16 @@ var App = function (_React$Component2) {
 
         _this3.state = {
             selCategory: 'ALL',
-            cntCart: 0,
-            priceCart: 0,
             searchKeyword: '',
-            albums: [],
-            cartAlbums: []
+            albums: []
         };
 
         _this3.categoryUpdate = _this3.categoryUpdate.bind(_this3);
         _this3.cartUpdate = _this3.cartUpdate.bind(_this3);
+
+        _this3.deleteCartItem = _this3.deleteCartItem.bind(_this3);
+        _this3.updateCartItem = _this3.updateCartItem.bind(_this3);
+        _this3.paymentCart = _this3.paymentCart.bind(_this3);
         return _this3;
     }
 
@@ -251,14 +494,21 @@ var App = function (_React$Component2) {
         value: function cartUpdate(album) {
             console.log('cart update');
 
-            var newCartAlbums = this.state.cartAlbums;
-            newCartAlbums.push(album);
+            var newAlbums = this.state.albums;
+
+            var chkNewItem = true;
+            newAlbums.filter(function (e, i) {
+                if (e.albumName === album.albumName) {
+                    chkNewItem = false;
+                    return false;
+                }
+            });
 
             this.setState({
-                cntCart: Number(this.state.cntCart) + 1,
-                priceCart: Number(this.state.priceCart) + Number(album.price),
-                cartAlbums: newCartAlbums
+                albums: newAlbums
             });
+
+            console.log(newAlbums);
         }
 
         /* 카테고리 업데이트를 한다. */
@@ -279,188 +529,53 @@ var App = function (_React$Component2) {
             /* 보이는 앨범도 업데이트 하자.. */
         }
     }, {
+        key: 'deleteCartItem',
+        value: function deleteCartItem(i) {
+            console.log(i);
+            var newAlbums = this.state.albums;
+
+            newAlbums[i].count = 0;
+
+            this.setState({
+                albums: newAlbums
+            });
+        }
+    }, {
+        key: 'updateCartItem',
+        value: function updateCartItem(i, val) {
+            var newAlbums = this.state.albums;
+            newAlbums[i].count = val;
+
+            this.setState({
+                albums: newAlbums
+            });
+        }
+    }, {
+        key: 'paymentCart',
+        value: function paymentCart() {
+            var newAlbums = this.state.albums;
+
+            newAlbums.filter(function (e, i) {
+                newAlbums[i].count = 0;
+            });
+
+            this.setState({
+                albums: newAlbums
+            });
+
+            alert('결제가 완료되었습니다.');
+
+            /* 결제 완료 후 모달을 닫을까?? 고민중.. */
+        }
+    }, {
         key: 'render',
         value: function render() {
             return React.createElement(
                 CategoryContext.Provider,
                 { value: this.state.selCategory },
-                React.createElement(
-                    'div',
-                    { className: 'modal fade', id: 'myModal', tabIndex: '-1', role: 'dialog', 'aria-labelledby': 'myModalLabel',
-                        'aria-hidden': 'true' },
-                    React.createElement(
-                        'div',
-                        { className: 'modal-dialog' },
-                        React.createElement(
-                            'div',
-                            { className: 'modal-content' },
-                            React.createElement(
-                                'div',
-                                { className: 'modal-header' },
-                                React.createElement(
-                                    'h5',
-                                    { className: 'modal-title', id: 'myModalLabel' },
-                                    '\uC7A5\uBC14\uAD6C\uB2C8'
-                                ),
-                                React.createElement(
-                                    'button',
-                                    { type: 'button', className: 'close', 'data-dismiss': 'modal',
-                                        'aria-hidden': 'true' },
-                                    '\xD7'
-                                )
-                            ),
-                            React.createElement(
-                                'div',
-                                { className: 'modal-body' },
-                                React.createElement(
-                                    'table',
-                                    { className: 'table table-bordered' },
-                                    React.createElement(
-                                        'thead',
-                                        { className: 'thead-dark' },
-                                        React.createElement(
-                                            'tr',
-                                            null,
-                                            React.createElement(
-                                                'th',
-                                                null,
-                                                '\uC568\uBC94\uC815\uBCF4'
-                                            ),
-                                            React.createElement(
-                                                'th',
-                                                null,
-                                                '\uAC00\uACA9'
-                                            ),
-                                            React.createElement(
-                                                'th',
-                                                null,
-                                                '\uC218\uB7C9'
-                                            ),
-                                            React.createElement(
-                                                'th',
-                                                null,
-                                                '\uD569\uACC4'
-                                            ),
-                                            React.createElement(
-                                                'th',
-                                                null,
-                                                '\uC0AD\uC81C'
-                                            )
-                                        )
-                                    ),
-                                    React.createElement(
-                                        'tbody',
-                                        null,
-                                        React.createElement(
-                                            'tr',
-                                            null,
-                                            React.createElement(
-                                                'td',
-                                                { className: 'albuminfo' },
-                                                React.createElement('img', { src: '/images/20162259.jpg', alt: 'img' }),
-                                                React.createElement(
-                                                    'div',
-                                                    { className: 'info' },
-                                                    React.createElement(
-                                                        'h4',
-                                                        null,
-                                                        'Lovelyz 4th Mini AlbumLovelyz 4th Mini Album'
-                                                    ),
-                                                    React.createElement(
-                                                        'span',
-                                                        null,
-                                                        React.createElement(
-                                                            'i',
-                                                            { className: 'fa fa-microphone' },
-                                                            ' \uC544\uD2F0\uC2A4\uD2B8'
-                                                        ),
-                                                        React.createElement(
-                                                            'p',
-                                                            null,
-                                                            '\uB7EC\uBE14\uB9AC\uC988(Lovelyz)'
-                                                        )
-                                                    ),
-                                                    React.createElement(
-                                                        'span',
-                                                        null,
-                                                        React.createElement(
-                                                            'i',
-                                                            { className: 'fa  fa-calendar' },
-                                                            ' \uBC1C\uB9E4\uC77C'
-                                                        ),
-                                                        React.createElement(
-                                                            'p',
-                                                            null,
-                                                            '2018.04.23'
-                                                        )
-                                                    )
-                                                )
-                                            ),
-                                            React.createElement(
-                                                'td',
-                                                { className: 'albumprice' },
-                                                '\uFFE6 20,000'
-                                            ),
-                                            React.createElement(
-                                                'td',
-                                                { className: 'albumqty' },
-                                                React.createElement(
-                                                    'label',
-                                                    null,
-                                                    React.createElement('input', { type: 'number', className: 'form-control', defaultValue: '1' })
-                                                )
-                                            ),
-                                            React.createElement(
-                                                'td',
-                                                { className: 'pricesum' },
-                                                '\uFFE6 20,000'
-                                            ),
-                                            React.createElement(
-                                                'td',
-                                                null,
-                                                React.createElement(
-                                                    'button',
-                                                    { className: 'btn btn-sm btn-secondary' },
-                                                    React.createElement('i', { className: 'fa fa-trash-o' }),
-                                                    ' \uC0AD\uC81C'
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
-                                React.createElement(
-                                    'div',
-                                    { className: 'totalprice text-right' },
-                                    React.createElement(
-                                        'h6',
-                                        null,
-                                        '\uCD1D \uD569\uACC4\uAE08\uC561 : ',
-                                        React.createElement(
-                                            'span',
-                                            null,
-                                            '\uFFE620,000'
-                                        ),
-                                        ' \uC6D0'
-                                    )
-                                )
-                            ),
-                            React.createElement(
-                                'div',
-                                { className: 'modal-footer' },
-                                React.createElement(
-                                    'button',
-                                    { type: 'button', className: 'btn btn-sm btn-secondary', 'data-dismiss': 'modal' },
-                                    '\uB2EB\uAE30'
-                                ),
-                                React.createElement(
-                                    'button',
-                                    { type: 'button', className: 'btn btn-sm btn-dark' },
-                                    '\uACB0\uC81C\uD558\uAE30'
-                                )
-                            )
-                        )
-                    )
-                ),
+                React.createElement(CartModal, { paymentCart: this.paymentCart, deleteCartItem: this.deleteCartItem,
+                    updateCartItem: this.updateCartItem,
+                    albums: this.state.albums }),
                 React.createElement(
                     'header',
                     null,
@@ -475,7 +590,7 @@ var App = function (_React$Component2) {
                                 { className: 'navbar-brand', href: '/' },
                                 'SKILLS MUSIC'
                             ),
-                            React.createElement(ShowCartButton, { cnt: this.state.cntCart, price: this.state.priceCart })
+                            React.createElement(ShowCartButton, { albums: this.state.albums })
                         )
                     )
                 ),
@@ -533,7 +648,7 @@ var App = function (_React$Component2) {
                                     )
                                 ),
                                 React.createElement('hr', null),
-                                React.createElement(AlbumList, { onAddCart: this.cartUpdate })
+                                React.createElement(AlbumList, { albums: this.state.albums, onAddCart: this.cartUpdate })
                             )
                         )
                     )
@@ -661,9 +776,6 @@ fetch('/music_data.json').then(function (res) {
 
     data = json.data;
 
-    /* 메뉴 정리하기 */
-    var items = '';
-
     /* json 데이터를 돌아가면서 보여주기 */
     data.filter(function (e, i) {
         data[i].count = 0;
@@ -672,15 +784,9 @@ fetch('/music_data.json').then(function (res) {
             menuArr.push(e.category);
             activeArr.push('');
         }
-
-        /* 장바구니에 존재하는 목록 이 부분도 React 로 처리하기 */
-        items += '<tr data-idx="' + (i + 1) + '" style={{display: \'none\'}}>\n                    <td class="albuminfo">\n                        <img src="/images/' + e.albumJaketImage + '" alt="img">\n                        <div class="info">\n                            <h4>' + e.albumName + '</h4>\n                            <span>\n                                <i class="fa fa-microphone"> \uC544\uD2F0\uC2A4\uD2B8</i> \n                                <p>' + e.artist + '</p>\n                            </span>\n                            <span>\n                                <i class="fa  fa-calendar"> \uBC1C\uB9E4\uC77C</i> \n                                <p>' + e.release + '</p>\n                            </span>\n                        </div>\n                    </td>\n                    <td class="albumprice">\n                        \uFFE6 ' + num(e.price).toLocaleString() + '\n                    </td>\n                    <td class="albumqty">\n                        <input type="number" class="form-control" min="1" value="0" />\n                    </td>\n                    <td class="pricesum">\n                        \uFFE6 0\n                    </td>\n                    <td>\n                        <button class="btn btn-default">\n                            <i class="fa fa-trash-o"/> \uC0AD\uC81C\n                        </button>\n                    </td>\n                </tr>';
     });
 
     ReactDOM.render(e(App), document.querySelector('#app'));
-
-    /* 아이템 목록 추가 */
-    $('.modal tbody').html(items);
 });
 
 /* 콤마 찍기. */
